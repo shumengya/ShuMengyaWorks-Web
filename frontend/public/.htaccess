@@ -1,0 +1,15 @@
+# Apache配置 - SPA路由支持
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.html [QSA,L]
+
+# 大文件上传支持
+# 注意：这些配置可能需要服务器级别的权限才能生效
+# 如果遇到问题，请联系服务器管理员
+<IfModule mod_php.c>
+    php_value upload_max_filesize 500M
+    php_value post_max_size 500M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>

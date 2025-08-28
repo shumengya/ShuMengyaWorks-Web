@@ -1,0 +1,167 @@
+{
+    "data": [
+      {
+        "上传时间": "2025-01-01T00:00:00",
+        "下载链接": {
+          "Android": [
+            "/api/download/aicodevartool/Android/aicodevartool_android.zip"
+          ],
+          "Linux": [
+            "/api/download/aicodevartool/Linux/aicodevartool_linux.zip"
+          ],
+          "Windows": [
+            "/api/download/aicodevartool/Windows/aicodevartool_windows.zip"
+          ]
+        },
+        "作品ID": "aicodevartool",
+        "作品作品": "AI代码变量工具",
+        "作品分类": "开发工具",
+        "作品封面": "image1.jpg",
+        "作品截图": [
+          "image1.jpg",
+          "image2.jpg",
+          "image3.jpg"
+        ],
+        "作品描述": "一个强大的AI辅助代码变量命名和管理工具，帮助开发者提高编程效率",
+        "作品标签": [
+          "AI",
+          "开发工具",
+          "代码助手",
+          "原创"
+        ],
+        "作品版本号": "1.0.0",
+        "作品视频": [],
+        "作者": "树萌芽",
+        "图片链接": [
+          "/api/image/aicodevartool/image1.jpg",
+          "/api/image/aicodevartool/image2.jpg",
+          "/api/image/aicodevartool/image3.jpg"
+        ],
+        "支持平台": [
+          "Windows",
+          "Android",
+          "Linux"
+        ],
+        "文件名称": {
+          "Android": [
+            "aicodevartool_android.zip"
+          ],
+          "Linux": [
+            "aicodevartool_linux.zip"
+          ],
+          "Windows": [
+            "aicodevartool_windows.zip"
+          ]
+        },
+        "更新时间": "2025-01-01T00:00:00",
+        "视频链接": []
+      },
+      {
+        "上传时间": "2024-12-15T00:00:00",
+        "下载链接": {
+          "Android": [
+            "/api/download/mengyafarm/Android/mengyafarm_android.apk"
+          ],
+          "Windows": [
+            "/api/download/mengyafarm/Windows/mengyafarm_windows.zip"
+          ]
+        },
+        "作品ID": "mengyafarm",
+        "作品作品": "萌芽农场",
+        "作品分类": "游戏",
+        "作品封面": "image1.png",
+        "作品截图": [
+          "image1.png",
+          "image2.png",
+          "image3.png",
+          "image4.png",
+          "image5.png",
+          "image6.png"
+        ],
+        "作品描述": "一款可爱的模拟经营类游戏，体验种植的乐趣，建设属于你的梦想农场",
+        "作品标签": [
+          "模拟经营",
+          "农场",
+          "休闲游戏",
+          "原创"
+        ],
+        "作品版本号": "2.1.0",
+        "作品视频": [],
+        "作者": "树萌芽",
+        "图片链接": [
+          "/api/image/mengyafarm/image1.png",
+          "/api/image/mengyafarm/image2.png",
+          "/api/image/mengyafarm/image3.png",
+          "/api/image/mengyafarm/image4.png",
+          "/api/image/mengyafarm/image5.png",
+          "/api/image/mengyafarm/image6.png"
+        ],
+        "支持平台": [
+          "Windows",
+          "Android"
+        ],
+        "文件名称": {
+          "Android": [
+            "mengyafarm_android.apk"
+          ],
+          "Windows": [
+            "mengyafarm_windows.zip"
+          ]
+        },
+        "更新时间": "2025-01-01T00:00:00",
+        "视频链接": []
+      },
+      {
+        "上传时间": "2025-01-01T00:00:00",
+        "下载链接": {
+          "Windows": [
+            "/api/download/mml_cgj2025/Windows/mml_cgj2025_windows.zip"
+          ]
+        },
+        "作品ID": "mml_cgj2025",
+        "作品作品": "MML创意游戏大赛2025",
+        "作品分类": "游戏",
+        "作品封面": "image1.jpg",
+        "作品截图": [
+          "image1.jpg",
+          "image2.jpg",
+          "image3.jpg",
+          "image4.jpg",
+          "image5.jpg"
+        ],
+        "作品描述": "参加2025年MML创意游戏大赛的参赛作品，展现独特的游戏创意和技术实力",
+        "作品标签": [
+          "比赛作品",
+          "创意游戏",
+          "2025",
+          "原创"
+        ],
+        "作品版本号": "1.0.0",
+        "作品视频": [
+          "video1.mp4"
+        ],
+        "作者": "树萌芽",
+        "图片链接": [
+          "/api/image/mml_cgj2025/image1.jpg",
+          "/api/image/mml_cgj2025/image2.jpg",
+          "/api/image/mml_cgj2025/image3.jpg",
+          "/api/image/mml_cgj2025/image4.jpg",
+          "/api/image/mml_cgj2025/image5.jpg"
+        ],
+        "支持平台": [
+          "Windows"
+        ],
+        "文件名称": {
+          "Windows": [
+            "mml_cgj2025_windows.zip"
+          ]
+        },
+        "更新时间": "2025-01-01T00:00:00",
+        "视频链接": [
+          "/api/video/mml_cgj2025/video1.mp4"
+        ]
+      }
+    ],
+    "success": true,
+    "total": 3
+  }
