@@ -9,11 +9,48 @@ import SearchBar from './components/SearchBar';
 import CategoryFilter from './components/CategoryFilter';
 import LoadingSpinner from './components/LoadingSpinner';
 import Footer from './components/Footer';
+import Pagination from './components/Pagination';
 import { getWorks, getSettings, getCategories, searchWorks } from './services/api';
 
 const AppContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(232, 245, 232, 0.4) 0%,
+    rgba(200, 230, 201, 0.4) 20%,
+    rgba(165, 214, 167, 0.4) 40%,
+    rgba(255, 255, 224, 0.3) 60%,
+    rgba(255, 255, 200, 0.3) 80%,
+    rgba(240, 255, 240, 0.4) 100%
+  );
+  background-size: 400% 400%;
+  animation: gentleShift 25s ease infinite;
+  position: relative;
+  
+  &:before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(1px);
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  @keyframes gentleShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 `;
 
 const MainContent = styled.main`
@@ -59,12 +96,17 @@ const NoResults = styled.div`
 `;
 
 // 首页组件
-const HomePage = () => {
+const HomePage = ({ settings }) => {
   const [works, setWorks] = useState([]);
+  const [allWorks, setAllWorks] = useState([]); // 存储所有作品数据
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // 从设置中获取每页作品数量，默认为9
+  const itemsPerPage = settings['每页作品数量'] || 9;
 
   useEffect(() => {
     loadInitialData();
@@ -78,8 +120,11 @@ const HomePage = () => {
         getCategories()
       ]);
       
-      setWorks(worksData.data || []);
+      const allWorksData = worksData.data || [];
+      setAllWorks(allWorksData);
+      setWorks(allWorksData);
       setCategories(categoriesData.data || []);
+      setCurrentPage(1); // 重置到第一页
     } catch (error) {
       console.error('加载数据失败:', error);
     } finally {
@@ -102,16 +147,32 @@ const HomePage = () => {
       setLoading(true);
       if (query || category) {
         const searchData = await searchWorks(query, category);
+        setAllWorks(searchData.data || []);
         setWorks(searchData.data || []);
       } else {
         const worksData = await getWorks();
+        setAllWorks(worksData.data || []);
         setWorks(worksData.data || []);
       }
+      setCurrentPage(1); // 搜索后重置到第一页
     } catch (error) {
       console.error('搜索失败:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // 分页相关的计算
+  const totalPages = Math.ceil(works.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentWorks = works.slice(startIndex, endIndex);
+
+  // 处理页面变化
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -128,14 +189,23 @@ const HomePage = () => {
       {loading ? (
         <LoadingSpinner />
       ) : works.length > 0 ? (
-        <WorksGrid>
-          {works.map((work) => (
-            <WorkCard key={work.作品ID} work={work} />
-          ))}
-        </WorksGrid>
+        <>
+          <WorksGrid>
+            {currentWorks.map((work) => (
+              <WorkCard key={work.作品ID} work={work} />
+            ))}
+          </WorksGrid>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={works.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+          />
+        </>
       ) : (
         <NoResults>
-          {searchQuery || selectedCategory ? '没有找到匹配的作品' : '暂无作品'}
+          {searchQuery || selectedCategory ? '🔍 没有找到匹配的作品' : '📝 暂无作品'}
         </NoResults>
       )}
     </MainContent>
@@ -163,7 +233,7 @@ function App() {
       <AppContainer>
         <Header settings={settings} />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage settings={settings} />} />
           <Route path="/work/:workId" element={<WorkDetail />} />
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>

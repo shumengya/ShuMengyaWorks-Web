@@ -9,6 +9,8 @@ import logging
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import tempfile
+import re
+import unicodedata
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -26,9 +28,12 @@ app.config['MAX_FORM_MEMORY_SIZE'] = 1024 * 1024 * 1024  # 1GB
 app.config['MAX_FORM_PARTS'] = 1000
 
 # 获取项目根目录
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# works 目录已移动到后端目录下
 WORKS_DIR = os.path.join(BASE_DIR, 'works')
-CONFIG_DIR = os.path.join(BASE_DIR, 'config')
+# config 目录已移动到前端目录下
+FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'SmyWorkCollect-Frontend'))
+CONFIG_DIR = os.path.join(FRONTEND_DIR, 'config')
 
 # 管理员token
 ADMIN_TOKEN = "shumengya520"
@@ -49,6 +54,52 @@ RATE_LIMITS = {
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def safe_filename(filename):
+    """
+    安全处理文件名，支持中文字符
+    """
+    if not filename:
+        return ''
+    
+    # 保留原始文件名用于显示
+    original_name = filename
+    
+    # 规范化Unicode字符
+    filename = unicodedata.normalize('NFKC', filename)
+    
+    # 移除或替换危险字符，但保留中文、英文、数字、点、下划线、连字符
+    # 允许的字符：中文字符、英文字母、数字、点、下划线、连字符、空格
+    safe_chars = re.sub(r'[^\w\s\-_.\u4e00-\u9fff]', '', filename)
+    
+    # 将多个空格替换为单个下划线
+    safe_chars = re.sub(r'\s+', '_', safe_chars)
+    
+    # 移除开头和结尾的点和空格
+    safe_chars = safe_chars.strip('. ')
+    
+    # 确保文件名不为空
+    if not safe_chars:
+        return 'unnamed_file'
+    
+    # 限制文件名长度（不包括扩展名）
+    name_part, ext_part = os.path.splitext(safe_chars)
+    if len(name_part.encode('utf-8')) > 200:  # 限制为200字节
+        # 截断文件名但保持完整的字符
+        name_bytes = name_part.encode('utf-8')[:200]
+        # 确保不会截断中文字符
+        try:
+            name_part = name_bytes.decode('utf-8')
+        except UnicodeDecodeError:
+            # 如果截断位置在中文字符中间，向前查找完整字符
+            for i in range(len(name_bytes) - 1, -1, -1):
+                try:
+                    name_part = name_bytes[:i].decode('utf-8')
+                    break
+                except UnicodeDecodeError:
+                    continue
+    
+    return name_part + ext_part
 
 def verify_admin_token():
     """验证管理员token"""
@@ -502,7 +553,8 @@ def admin_upload_file(work_id, file_type):
             logger.error("没有选择文件")
             return jsonify({'success': False, 'message': '没有选择文件'}), 400
         
-        original_filename = secure_filename(file.filename)
+        # 保存原始文件名（包含中文）
+        original_filename = file.filename
         logger.info(f"原始文件名: {original_filename}")
         
         # 检查文件格式
@@ -510,7 +562,11 @@ def admin_upload_file(work_id, file_type):
             logger.error(f"不支持的文件格式: {original_filename}")
             return jsonify({'success': False, 'message': '不支持的文件格式'}), 400
         
-        file_extension = original_filename.rsplit('.', 1)[1].lower()
+        # 使用安全的文件名处理函数
+        safe_original_filename = safe_filename(original_filename)
+        file_extension = safe_original_filename.rsplit('.', 1)[1].lower() if '.' in safe_original_filename else 'unknown'
+        
+        logger.info(f"安全处理后的文件名: {safe_original_filename}")
         
         # 读取现有配置来生成新文件名
         config_path = os.path.join(work_dir, 'work_config.json')
@@ -525,20 +581,45 @@ def admin_upload_file(work_id, file_type):
         if file_type == 'image':
             save_dir = os.path.join(work_dir, 'image')
             existing_images = config.get('作品截图', [])
-            image_number = len(existing_images) + 1
-            filename = f"image{image_number}.{file_extension}"
+            
+            # 尝试使用原始文件名，如果重复则添加序号
+            base_name = safe_original_filename
+            filename = base_name
+            counter = 1
+            while filename in existing_images:
+                name_part, ext_part = os.path.splitext(base_name)
+                filename = f"{name_part}_{counter}{ext_part}"
+                counter += 1
+                
         elif file_type == 'video':
             save_dir = os.path.join(work_dir, 'video')
             existing_videos = config.get('作品视频', [])
-            video_number = len(existing_videos) + 1
-            filename = f"video{video_number}.{file_extension}"
+            
+            # 尝试使用原始文件名，如果重复则添加序号
+            base_name = safe_original_filename
+            filename = base_name
+            counter = 1
+            while filename in existing_videos:
+                name_part, ext_part = os.path.splitext(base_name)
+                filename = f"{name_part}_{counter}{ext_part}"
+                counter += 1
+                
         elif file_type == 'platform':
             platform = request.form.get('platform')
             if not platform:
                 logger.error("平台参数缺失")
                 return jsonify({'success': False, 'message': '平台参数缺失'}), 400
             save_dir = os.path.join(work_dir, 'platform', platform)
-            filename = f"{work_id}_{platform.lower()}.{file_extension}"
+            
+            # 对于平台文件，也尝试保留原始文件名
+            existing_files = config.get('文件名称', {}).get(platform, [])
+            base_name = safe_original_filename
+            filename = base_name
+            counter = 1
+            while filename in existing_files:
+                name_part, ext_part = os.path.splitext(base_name)
+                filename = f"{name_part}_{counter}{ext_part}"
+                counter += 1
         else:
             logger.error(f"不支持的文件类型: {file_type}")
             return jsonify({'success': False, 'message': '不支持的文件类型'}), 400
@@ -586,16 +667,25 @@ def admin_upload_file(work_id, file_type):
         if file_type == 'image':
             if filename not in config.get('作品截图', []):
                 config.setdefault('作品截图', []).append(filename)
+            # 记录原始文件名映射
+            config.setdefault('原始文件名', {})
+            config['原始文件名'][filename] = original_filename
             if not config.get('作品封面'):
                 config['作品封面'] = filename
         elif file_type == 'video':
             if filename not in config.get('作品视频', []):
                 config.setdefault('作品视频', []).append(filename)
+            # 记录原始文件名映射
+            config.setdefault('原始文件名', {})
+            config['原始文件名'][filename] = original_filename
         elif file_type == 'platform':
             platform = request.form.get('platform')
             config.setdefault('文件名称', {}).setdefault(platform, [])
             if filename not in config['文件名称'][platform]:
                 config['文件名称'][platform].append(filename)
+            # 记录原始文件名映射
+            config.setdefault('原始文件名', {})
+            config['原始文件名'][filename] = original_filename
         
         config['更新时间'] = datetime.now().isoformat()
         
@@ -679,16 +769,25 @@ def admin_delete_file(work_id, file_type, filename):
         if file_type == 'image':
             if filename in config.get('作品截图', []):
                 config['作品截图'].remove(filename)
+            # 清理原始文件名映射
+            if '原始文件名' in config and filename in config['原始文件名']:
+                del config['原始文件名'][filename]
             if config.get('作品封面') == filename:
                 config['作品封面'] = config['作品截图'][0] if config['作品截图'] else ''
         elif file_type == 'video':
             if filename in config.get('作品视频', []):
                 config['作品视频'].remove(filename)
+            # 清理原始文件名映射
+            if '原始文件名' in config and filename in config['原始文件名']:
+                del config['原始文件名'][filename]
         elif file_type == 'platform':
             platform = request.args.get('platform')
             if platform in config.get('文件名称', {}):
                 if filename in config['文件名称'][platform]:
                     config['文件名称'][platform].remove(filename)
+            # 清理原始文件名映射
+            if '原始文件名' in config and filename in config['原始文件名']:
+                del config['原始文件名'][filename]
         
         config['更新时间'] = datetime.now().isoformat()
         

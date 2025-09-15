@@ -19,6 +19,7 @@ const DetailContainer = styled.div`
   max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
+  min-height: 100vh;
   
   @media (max-width: 768px) {
     padding: 10px;
@@ -26,18 +27,25 @@ const DetailContainer = styled.div`
 `;
 
 const BackButton = styled.button`
-  background: #81c784;
+  background: linear-gradient(45deg, #81c784, #66bb6a);
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 25px;
   cursor: pointer;
   font-size: 14px;
   margin-bottom: 20px;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(129, 199, 132, 0.3);
+  
+  &:before {
+    content: '🏠 ';
+  }
   
   &:hover {
-    background: #66bb6a;
+    background: linear-gradient(45deg, #66bb6a, #4caf50);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(129, 199, 132, 0.4);
   }
   
   @media (max-width: 768px) {
@@ -265,8 +273,28 @@ const StatsSection = styled.div`
   margin: 20px 0;
   
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     gap: 10px;
+    padding-bottom: 5px;
+    
+    /* 添加滚动条样式 */
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #81c784;
+      border-radius: 10px;
+    }
   }
 `;
 
@@ -285,6 +313,9 @@ const StatCard = styled.div`
   
   @media (max-width: 768px) {
     padding: 12px;
+    min-width: 80px;
+    flex: 1 0 auto;
+    margin-right: 2px;
   }
 `;
 
@@ -319,7 +350,18 @@ const StatLabel = styled.div`
 `;
 
 const LikeButton = styled.button`
-  background: ${props => props.liked ? '#4caf50' : '#81c784'};
+  background: linear-gradient(
+    45deg,
+    rgba(255, 107, 107, 0.8),
+    rgba(255, 165, 0, 0.8),
+    rgba(255, 255, 0, 0.7),
+    rgba(50, 205, 50, 0.8),
+    rgba(0, 191, 255, 0.8),
+    rgba(65, 105, 225, 0.8),
+    rgba(147, 112, 219, 0.8)
+  );
+  background-size: 300% 300%;
+  animation: buttonRainbow 12s ease infinite;
   color: white;
   border: none;
   border-radius: 12px;
@@ -331,10 +373,11 @@ const LikeButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   
   &:hover {
-    background: ${props => props.liked ? '#45a049' : '#66bb6a'};
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   }
   
   &:active {
@@ -345,6 +388,16 @@ const LikeButton = styled.button`
     background: #ccc;
     cursor: not-allowed;
     transform: none;
+    animation: none;
+  }
+  
+  @keyframes buttonRainbow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
   
   @media (max-width: 768px) {
@@ -363,6 +416,98 @@ const ErrorMessage = styled.div`
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 `;
 
+// 模态框样式
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
+`;
+
+const ModalContent = styled.div`
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+`;
+
+const ModalImage = styled.img`
+  width: 100%;
+  height: auto;
+  max-height: 85vh;
+  object-fit: contain;
+  display: block;
+`;
+
+const ModalVideo = styled.video`
+  width: 100%;
+  height: auto;
+  max-height: 85vh;
+  display: block;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: background 0.3s ease;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  
+  @media (max-width: 768px) {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+    top: 10px;
+    right: 10px;
+  }
+`;
+
+const ModalTitle = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 20px;
+  font-size: 16px;
+  z-index: 1001;
+  
+  @media (max-width: 768px) {
+    padding: 15px;
+    font-size: 14px;
+  }
+`;
+
 const WorkDetail = () => {
   const { workId } = useParams();
   const navigate = useNavigate();
@@ -371,6 +516,12 @@ const WorkDetail = () => {
   const [error, setError] = useState(null);
   const [liking, setLiking] = useState(false);
   const [likeMessage, setLikeMessage] = useState('');
+  
+  // 模态框状态
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(''); // 'image' 或 'video'
+  const [modalSrc, setModalSrc] = useState('');
+  const [modalTitle, setModalTitle] = useState('');
 
   useEffect(() => {
     loadWorkDetail();
@@ -403,9 +554,55 @@ const WorkDetail = () => {
     });
   };
 
-  const handleImageClick = (imageUrl) => {
-    window.open(`${getApiBaseUrl()}${imageUrl}`, '_blank');
+  // 打开图片模态框
+  const handleImageClick = (imageUrl, index) => {
+    setModalType('image');
+    setModalSrc(`${getApiBaseUrl()}${imageUrl}`);
+    setModalTitle(`${work.作品作品} - 截图 ${index + 1}`);
+    setModalOpen(true);
   };
+
+  // 打开视频模态框
+  const handleVideoClick = (videoUrl, index) => {
+    setModalType('video');
+    setModalSrc(`${getApiBaseUrl()}${videoUrl}`);
+    setModalTitle(`${work.作品作品} - 视频 ${index + 1}`);
+    setModalOpen(true);
+  };
+
+  // 关闭模态框
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalType('');
+    setModalSrc('');
+    setModalTitle('');
+  };
+
+  // 处理模态框背景点击
+  const handleModalOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      closeModal();
+    }
+  };
+
+  // 处理键盘事件
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Escape' && modalOpen) {
+        closeModal();
+      }
+    };
+
+    if (modalOpen) {
+      document.addEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'hidden'; // 防止背景滚动
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'unset';
+    };
+  }, [modalOpen]);
 
   const handleLike = async () => {
     if (liking) return;
@@ -447,7 +644,7 @@ const WorkDetail = () => {
     return (
       <DetailContainer>
         <BackButton onClick={() => navigate('/')}>
-          ← 返回首页
+          返回首页
         </BackButton>
         <ErrorMessage>{error}</ErrorMessage>
       </DetailContainer>
@@ -458,7 +655,7 @@ const WorkDetail = () => {
     return (
       <DetailContainer>
         <BackButton onClick={() => navigate('/')}>
-          ← 返回首页
+          返回首页
         </BackButton>
         <ErrorMessage>作品不存在</ErrorMessage>
       </DetailContainer>
@@ -476,19 +673,19 @@ const WorkDetail = () => {
         
         <WorkMeta>
           <MetaItem>
-            <strong>作者:</strong> {work.作者}
+            <strong>👨‍💻 作者:</strong> {work.作者}
           </MetaItem>
           <MetaItem>
-            <strong>版本:</strong> {work.作品版本号}
+            <strong>🏷️ 版本:</strong> {work.作品版本号}
           </MetaItem>
           <MetaItem>
-            <strong>分类:</strong> {work.作品分类}
+            <strong>📂 分类:</strong> {work.作品分类}
           </MetaItem>
           <MetaItem>
-            <strong>上传时间:</strong> {formatDate(work.上传时间)}
+            <strong>📅 上传时间:</strong> {formatDate(work.上传时间)}
           </MetaItem>
           <MetaItem>
-            <strong>更新时间:</strong> {formatDate(work.更新时间)}
+            <strong>🔄 更新时间:</strong> {formatDate(work.更新时间)}
           </MetaItem>
         </WorkMeta>
         
@@ -513,17 +710,17 @@ const WorkDetail = () => {
         {/* 统计数据 */}
         <StatsSection>
           <StatCard>
-            <StatIcon>👁️</StatIcon>
+            <StatIcon>👁️‍🗨️</StatIcon>
             <StatValue>{work.作品浏览量 || 0}</StatValue>
             <StatLabel>浏览量</StatLabel>
           </StatCard>
           <StatCard>
-            <StatIcon>⬇️</StatIcon>
+            <StatIcon>📥</StatIcon>
             <StatValue>{work.作品下载量 || 0}</StatValue>
             <StatLabel>下载量</StatLabel>
           </StatCard>
           <StatCard>
-            <StatIcon>👍</StatIcon>
+            <StatIcon>💖</StatIcon>
             <StatValue>{work.作品点赞量 || 0}</StatValue>
             <StatLabel>点赞量</StatLabel>
           </StatCard>
@@ -544,8 +741,8 @@ const WorkDetail = () => {
             position: 'relative'
           }}
         >
-          <span>👍</span>
-          {liking ? '点赞中...' : '点赞作品'}
+          <span>💖</span>
+          {liking ? '💫 点赞中...' : '点赞作品'}
           {likeMessage && (
             <div style={{
               position: 'absolute',
@@ -567,10 +764,14 @@ const WorkDetail = () => {
 
       {work.视频链接 && work.视频链接.length > 0 && (
         <ContentSection>
-          <SectionTitle>作品视频</SectionTitle>
+          <SectionTitle>🎬 作品视频</SectionTitle>
           {work.视频链接.map((videoUrl, index) => (
             <VideoContainer key={index}>
-              <VideoPlayer controls>
+              <VideoPlayer 
+                controls
+                onClick={() => handleVideoClick(videoUrl, index)}
+                style={{ cursor: 'pointer' }}
+              >
                 <source src={`${getApiBaseUrl()}${videoUrl}`} type="video/mp4" />
                 您的浏览器不支持视频播放
               </VideoPlayer>
@@ -579,28 +780,9 @@ const WorkDetail = () => {
         </ContentSection>
       )}
 
-      {work.图片链接 && work.图片链接.length > 0 && (
-        <ContentSection>
-          <SectionTitle>作品截图</SectionTitle>
-          <ImageGallery>
-            {work.图片链接.map((imageUrl, index) => (
-              <WorkImage
-                key={index}
-                src={`${getApiBaseUrl()}${imageUrl}`}
-                alt={`${work.作品作品} 截图 ${index + 1}`}
-                onClick={() => handleImageClick(imageUrl)}
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-            ))}
-          </ImageGallery>
-        </ContentSection>
-      )}
-
       {work.下载链接 && Object.keys(work.下载链接).length > 0 && (
         <ContentSection>
-          <SectionTitle>下载作品</SectionTitle>
+          <SectionTitle>📦 下载作品</SectionTitle>
           <DownloadSection>
             {Object.entries(work.下载链接).map(([platform, links]) => (
               <PlatformDownload key={platform}>
@@ -611,13 +793,60 @@ const WorkDetail = () => {
                     href={`${getApiBaseUrl()}${link}`}
                     download
                   >
-                    下载 {platform} 版本
+                    📥 下载 {platform} 版本
                   </DownloadButton>
                 ))}
               </PlatformDownload>
             ))}
           </DownloadSection>
         </ContentSection>
+      )}
+
+      {work.图片链接 && work.图片链接.length > 0 && (
+        <ContentSection>
+          <SectionTitle>🖼️ 作品截图</SectionTitle>
+          <ImageGallery>
+            {work.图片链接.map((imageUrl, index) => (
+              <WorkImage
+                key={index}
+                src={`${getApiBaseUrl()}${imageUrl}`}
+                alt={`${work.作品作品} 截图 ${index + 1}`}
+                onClick={() => handleImageClick(imageUrl, index)}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            ))}
+          </ImageGallery>
+        </ContentSection>
+      )}
+
+      {/* 模态框 */}
+      {modalOpen && (
+        <ModalOverlay onClick={handleModalOverlayClick}>
+          <ModalContent>
+            <CloseButton onClick={closeModal}>×</CloseButton>
+            {modalType === 'image' ? (
+              <ModalImage 
+                src={modalSrc} 
+                alt={modalTitle}
+                onError={(e) => {
+                  console.error('图片加载失败:', modalSrc);
+                }}
+              />
+            ) : modalType === 'video' ? (
+              <ModalVideo 
+                src={modalSrc} 
+                controls 
+                autoPlay
+                onError={(e) => {
+                  console.error('视频加载失败:', modalSrc);
+                }}
+              />
+            ) : null}
+            <ModalTitle>{modalTitle}</ModalTitle>
+          </ModalContent>
+        </ModalOverlay>
       )}
     </DetailContainer>
   );

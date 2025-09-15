@@ -14,16 +14,18 @@ const getApiBaseUrl = () => {
 };
 
 const Card = styled.div`
-  background: white;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 255, 248, 0.95));
   border-radius: 15px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
+  border: 1px solid rgba(129, 199, 132, 0.2);
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 30px rgba(129, 199, 132, 0.2);
+    border-color: rgba(129, 199, 132, 0.4);
   }
 `;
 
@@ -192,7 +194,7 @@ const WorkCard = ({ work }) => {
           />
         ) : null}
         <ImagePlaceholder style={{ display: getCoverImage() ? 'none' : 'flex' }}>
-          🎮
+          🎨
         </ImagePlaceholder>
       </ImageContainer>
       
@@ -212,13 +214,13 @@ const WorkCard = ({ work }) => {
         )}
         
         <InfoRow>
-          <span>作者: {work.作者}</span>
-          <span>v{work.作品版本号}</span>
+          <span>👨‍💻 作者: {work.作者}</span>
+          <span>🏷️ v{work.作品版本号}</span>
         </InfoRow>
         
         <InfoRow>
-          <span>分类: {work.作品分类}</span>
-          <span>{formatDate(work.更新时间)}</span>
+          <span>📂 分类: {work.作品分类}</span>
+          <span>📅 {formatDate(work.更新时间)}</span>
         </InfoRow>
         
         {work.支持平台 && work.支持平台.length > 0 && (
@@ -231,25 +233,25 @@ const WorkCard = ({ work }) => {
         
         <StatsContainer>
           <StatItem>
-            <StatIcon>浏览量</StatIcon>
+            <StatIcon>👀</StatIcon>
             <StatValue>{work.作品浏览量 || 0}</StatValue>
           </StatItem>
           <StatItem>
-            <StatIcon>下载量</StatIcon>
+            <StatIcon>📥</StatIcon>
             <StatValue>{work.作品下载量 || 0}</StatValue>
           </StatItem>
           <StatItem>
-            <StatIcon>点赞数</StatIcon>
+            <StatIcon>💖</StatIcon>
             <StatValue>{work.作品点赞量 || 0}</StatValue>
           </StatItem>
           <StatItem>
-            <StatIcon>更新次数</StatIcon>
+            <StatIcon>🔄</StatIcon>
             <StatValue>{work.作品更新次数 || 0}</StatValue>
           </StatItem>
         </StatsContainer>
         
         <ViewDetailText>
-          点击查看详情 →
+          🌟 点击查看详情 →
         </ViewDetailText>
       </CardContent>
     </Card>
