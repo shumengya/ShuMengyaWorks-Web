@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  smywork-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smywork-app
+    restart: unless-stopped
+    ports:
+      - "8383:8383"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # 持久化数据目录（根据你的要求统一为 /shumengya/docker/smyworkcollect/data/）
+      - /shumengya/docker/smyworkcollect/data/works:/app/backend/works
+      - /shumengya/docker/smyworkcollect/data/config:/app/SmyWorkCollect-Frontend/config
+      # 可选：持久化 Nginx 日志
+      - /shumengya/docker/smyworkcollect/data/logs:/var/log/nginx
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf http://localhost:8383 >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
